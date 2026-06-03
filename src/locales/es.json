@@ -1,0 +1,109 @@
+{
+  "nav": {
+    "brand": "HabitTeam",
+    "howItWorks": "Cómo funciona",
+    "features": "Características",
+    "pricing": "Precios",
+    "login": "Acceder",
+    "langEs": "ES",
+    "langEn": "EN"
+  },
+  "hero": {
+    "line1": "Los hábitos",
+    "line2": "que nunca",
+    "line3": "lograste solo.",
+    "subtitle": "La plataforma de hábitos corporativos con validación entre compañeros.",
+    "cta": "Empieza gratis",
+    "ctaSecondary": "Ver cómo funciona →"
+  },
+  "howItWorks": {
+    "title": "Cómo funciona",
+    "steps": [
+      {
+        "title": "Crea un equipo",
+        "description": "Invita a las personas con las que quieres crecer. Puede ser tu pareja, tu familia, tus socios o tu equipo de trabajo."
+      },
+      {
+        "title": "Define los hábitos",
+        "description": "Elige qué queréis hacer juntos cada día. Ejercicio, lectura, meditación, deep work — lo que tenga sentido para vosotros."
+      },
+      {
+        "title": "Marcad el check cada día",
+        "description": "Un check rápido al completarlo. Veis el progreso de todos en tiempo real y la racha del equipo crece solo cuando todos participan."
+      }
+    ]
+  },
+  "features": {
+    "title": "Todo lo que necesitas.",
+    "titleAccent": "Nada más.",
+    "list": [
+      "Crea hábitos compartidos con tu equipo o familia",
+      "Seguimiento diario en tiempo real para todos los miembros",
+      "Rachas grupales que se mantienen solo si todos participan",
+      "Notificaciones inteligentes sin spam",
+      "Dashboard de progreso semanal y mensual",
+      "Hasta 10 hábitos activos por equipo en el plan gratuito",
+      "Historial completo exportable en CSV",
+      "Aplicación web progresiva, funciona en cualquier dispositivo"
+    ]
+  },
+  "pricing": {
+    "title": "Precios",
+    "subtitle": "Sin sorpresas. Sin pagos anuales obligatorios.",
+    "ctaFree": "Empezar gratis",
+    "ctaPro": "Empieza con Pro",
+    "plans": [
+      {
+        "name": "Gratis",
+        "price": "0€",
+        "period": "para siempre",
+        "features": [
+          "1 equipo hasta 5 personas",
+          "Hasta 3 hábitos activos",
+          "Historial últimos 30 días",
+          "Notificaciones básicas"
+        ]
+      },
+      {
+        "name": "Pro",
+        "price": "4€",
+        "period": "por persona / mes",
+        "features": [
+          "Equipos ilimitados",
+          "Hábitos ilimitados",
+          "Historial completo",
+          "Notificaciones avanzadas",
+          "Exportación CSV",
+          "Soporte prioritario"
+        ]
+      },
+      {
+        "name": "Equipo",
+        "price": "12€",
+        "period": "hasta 10 personas / mes",
+        "features": [
+          "Todo lo de Pro",
+          "Gestión centralizada",
+          "Factura para empresa",
+          "Onboarding dedicado"
+        ]
+      }
+    ]
+  },
+  "cta": {
+    "line1": "¿Listo para",
+    "line2": "empezar",
+    "line3": "juntos?",
+    "button": "Crear mi equipo gratis"
+  },
+  "footer": {
+    "tagline": "Construye hábitos que duran, con las personas que te importan.",
+    "copyright": "Todos los derechos reservados.",
+    "colProduct": "Producto",
+    "colCompany": "Empresa",
+    "colLegal": "Legal",
+    "product": ["Cómo funciona", "Características", "Precios", "Novedades"],
+    "company": ["Sobre nosotros", "Blog", "Contacto"],
+    "legal": ["Privacidad", "Términos", "Cookies"]
+  }
+}

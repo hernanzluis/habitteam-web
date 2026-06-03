@@ -1,0 +1,109 @@
+{
+  "nav": {
+    "brand": "HabitTeam",
+    "howItWorks": "How it works",
+    "features": "Features",
+    "pricing": "Pricing",
+    "login": "Log in",
+    "langEs": "ES",
+    "langEn": "EN"
+  },
+  "hero": {
+    "line1": "The habits",
+    "line2": "you never",
+    "line3": "built alone.",
+    "subtitle": "The corporate habit platform with peer validation.",
+    "cta": "Start for free",
+    "ctaSecondary": "See how it works →"
+  },
+  "howItWorks": {
+    "title": "How it works",
+    "steps": [
+      {
+        "title": "Create a team",
+        "description": "Invite the people you want to grow with. It can be your partner, your family, your co-founders or your work team."
+      },
+      {
+        "title": "Define your habits",
+        "description": "Choose what you want to do together every day. Exercise, reading, meditation, deep work — whatever makes sense for you."
+      },
+      {
+        "title": "Check in every day",
+        "description": "A quick check when you complete it. Everyone sees real-time progress and the team streak only grows when everyone participates."
+      }
+    ]
+  },
+  "features": {
+    "title": "Everything you need.",
+    "titleAccent": "Nothing more.",
+    "list": [
+      "Create shared habits with your team or family",
+      "Real-time daily tracking for all members",
+      "Group streaks that only hold when everyone participates",
+      "Smart notifications without spam",
+      "Weekly and monthly progress dashboard",
+      "Up to 10 active habits per team on the free plan",
+      "Full history exportable as CSV",
+      "Progressive web app, works on any device"
+    ]
+  },
+  "pricing": {
+    "title": "Pricing",
+    "subtitle": "No surprises. No mandatory annual payments.",
+    "ctaFree": "Start for free",
+    "ctaPro": "Start with Pro",
+    "plans": [
+      {
+        "name": "Free",
+        "price": "$0",
+        "period": "forever",
+        "features": [
+          "1 team up to 5 people",
+          "Up to 3 active habits",
+          "Last 30 days history",
+          "Basic notifications"
+        ]
+      },
+      {
+        "name": "Pro",
+        "price": "$4",
+        "period": "per person / month",
+        "features": [
+          "Unlimited teams",
+          "Unlimited habits",
+          "Full history",
+          "Advanced notifications",
+          "CSV export",
+          "Priority support"
+        ]
+      },
+      {
+        "name": "Team",
+        "price": "$12",
+        "period": "up to 10 people / month",
+        "features": [
+          "Everything in Pro",
+          "Centralized management",
+          "Company invoice",
+          "Dedicated onboarding"
+        ]
+      }
+    ]
+  },
+  "cta": {
+    "line1": "Ready to",
+    "line2": "start",
+    "line3": "together?",
+    "button": "Create my team for free"
+  },
+  "footer": {
+    "tagline": "Build habits that last, with the people who matter.",
+    "copyright": "All rights reserved.",
+    "colProduct": "Product",
+    "colCompany": "Company",
+    "colLegal": "Legal",
+    "product": ["How it works", "Features", "Pricing", "What's new"],
+    "company": ["About us", "Blog", "Contact"],
+    "legal": ["Privacy", "Terms", "Cookies"]
+  }
+}
