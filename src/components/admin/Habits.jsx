@@ -254,11 +254,49 @@ function HabitForm({ title, setTitle, description, setDescription, recurrence, s
   );
 }
 
+function AvatarStack({ userIds, membersById }) {
+  const visible = userIds.slice(0, 4);
+  const overflow = userIds.length - visible.length;
+  return (
+    <div className="flex items-center">
+      {visible.map((uid, idx) => {
+        const m = membersById[uid];
+        const initial = m?.full_name?.charAt(0).toUpperCase() || '?';
+        return (
+          <div
+            key={uid}
+            title={m?.full_name || uid}
+            style={{ marginLeft: idx > 0 ? '-6px' : '0', zIndex: 4 - idx }}
+            className="relative w-7 h-7 rounded-full border-2 border-white overflow-hidden shrink-0"
+          >
+            {m?.avatar_url ? (
+              <img src={m.avatar_url} alt={m.full_name} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-[#0A66C2] flex items-center justify-center">
+                <span className="text-white text-xs font-bold leading-none">{initial}</span>
+              </div>
+            )}
+          </div>
+        );
+      })}
+      {overflow > 0 ? (
+        <div
+          style={{ marginLeft: '-6px', zIndex: 0 }}
+          className="relative w-7 h-7 rounded-full border-2 border-white bg-gray-200 flex items-center justify-center shrink-0"
+        >
+          <span className="text-gray-600 text-xs font-bold leading-none">+{overflow}</span>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export default function Habits({ companyId, adminId }) {
   const [habits, setHabits] = useState([]);
   const [categories, setCategories] = useState([]);
   const [members, setMembers] = useState([]);
   const [assignedCounts, setAssignedCounts] = useState({});
+  const [habitAssignmentsMap, setHabitAssignmentsMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [togglingId, setTogglingId] = useState(null);
@@ -303,8 +341,8 @@ export default function Habits({ companyId, adminId }) {
           .eq('company_id', companyId)
           .order('created_at', { ascending: false }),
         supabase.from('categories').select('id, name, icon, color').or(`company_id.is.null,company_id.eq.${companyId}`),
-        supabase.from('profiles').select('id, full_name').eq('company_id', companyId).order('full_name'),
-        supabase.from('habit_assignments').select('habit_id').in('habit_id',
+        supabase.from('profiles').select('id, full_name, avatar_url').eq('company_id', companyId).order('full_name'),
+        supabase.from('habit_assignments').select('habit_id, user_id').in('habit_id',
           (await supabase.from('habits').select('id').eq('company_id', companyId)).data?.map(h => h.id) || []
         ),
       ]);
@@ -313,14 +351,18 @@ export default function Habits({ companyId, adminId }) {
       if (mErr) throw mErr;
 
       const counts = {};
-      (assignData || []).forEach(({ habit_id }) => {
+      const assignMap = {};
+      (assignData || []).forEach(({ habit_id, user_id }) => {
         counts[habit_id] = (counts[habit_id] || 0) + 1;
+        if (!assignMap[habit_id]) assignMap[habit_id] = [];
+        assignMap[habit_id].push(user_id);
       });
 
       setHabits(habitsData || []);
       setCategories(catsData || []);
       setMembers(membersData || []);
       setAssignedCounts(counts);
+      setHabitAssignmentsMap(assignMap);
     } catch (e) {
       setError(e.message || 'Error cargando hábitos');
     } finally {
@@ -514,6 +556,7 @@ export default function Habits({ companyId, adminId }) {
   };
 
   const catMap = Object.fromEntries(categories.map((c) => [c.id, c]));
+  const membersById = Object.fromEntries(members.map((m) => [m.id, m]));
 
   if (loading) {
     return <p className="text-sm text-gray-400 py-8 text-center">Cargando hábitos...</p>;
@@ -576,8 +619,15 @@ export default function Habits({ companyId, adminId }) {
                     <td className="px-4 py-3 text-gray-500 hidden md:table-cell">
                       {recurrenceLabel(h)}
                     </td>
-                    <td className="px-4 py-3 text-gray-500 hidden lg:table-cell">
-                      {assignedCounts[h.id] || 0}
+                    <td className="px-4 py-3 hidden lg:table-cell">
+                      {(habitAssignmentsMap[h.id] || []).length > 0 ? (
+                        <AvatarStack
+                          userIds={habitAssignmentsMap[h.id]}
+                          membersById={membersById}
+                        />
+                      ) : (
+                        <span className="text-gray-300 text-xs">—</span>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <button
