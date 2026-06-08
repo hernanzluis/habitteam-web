@@ -296,6 +296,7 @@ export default function Habits({ companyId, adminId }) {
   const [categories, setCategories] = useState([]);
   const [members, setMembers] = useState([]);
   const [habitAssignmentsMap, setHabitAssignmentsMap] = useState({});
+  const [habitValidatorsMap, setHabitValidatorsMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [togglingId, setTogglingId] = useState(null);
@@ -334,6 +335,7 @@ export default function Habits({ companyId, adminId }) {
         { data: catsData, error: cErr },
         { data: membersData, error: mErr },
         { data: assignData },
+        { data: validatorsData },
       ] = await Promise.all([
         supabase.from('habits')
           .select('id, title, description, recurrence, weekly_target, is_active, created_at, category_id, photo_required, due_time, expires_at')
@@ -342,6 +344,9 @@ export default function Habits({ companyId, adminId }) {
         supabase.from('categories').select('id, name, icon, color').or(`company_id.is.null,company_id.eq.${companyId}`),
         supabase.from('profiles').select('id, full_name, avatar_url').eq('company_id', companyId).order('full_name'),
         supabase.from('habit_assignments').select('habit_id, user_id').in('habit_id',
+          (await supabase.from('habits').select('id').eq('company_id', companyId)).data?.map(h => h.id) || []
+        ),
+        supabase.from('habit_validators').select('habit_id, user_id').in('habit_id',
           (await supabase.from('habits').select('id').eq('company_id', companyId)).data?.map(h => h.id) || []
         ),
       ]);
@@ -355,10 +360,17 @@ export default function Habits({ companyId, adminId }) {
         assignMap[habit_id].push(user_id);
       });
 
+      const validatorsMap = {};
+      (validatorsData || []).forEach(({ habit_id, user_id }) => {
+        if (!validatorsMap[habit_id]) validatorsMap[habit_id] = [];
+        validatorsMap[habit_id].push(user_id);
+      });
+
       setHabits(habitsData || []);
       setCategories(catsData || []);
       setMembers(membersData || []);
       setHabitAssignmentsMap(assignMap);
+      setHabitValidatorsMap(validatorsMap);
     } catch (e) {
       setError(e.message || 'Error cargando hábitos');
     } finally {
@@ -583,6 +595,7 @@ export default function Habits({ companyId, adminId }) {
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden sm:table-cell">Categoría</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">Recurrencia</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden lg:table-cell">Asignados</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden lg:table-cell">Validadores</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Estado</th>
                 <th className="px-4 py-3" />
               </tr>
@@ -617,10 +630,14 @@ export default function Habits({ companyId, adminId }) {
                     </td>
                     <td className="px-4 py-3 hidden lg:table-cell">
                       {(habitAssignmentsMap[h.id] || []).length > 0 ? (
-                        <AvatarStack
-                          userIds={habitAssignmentsMap[h.id]}
-                          membersById={membersById}
-                        />
+                        <AvatarStack userIds={habitAssignmentsMap[h.id]} membersById={membersById} />
+                      ) : (
+                        <span className="text-gray-300 text-xs">—</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 hidden lg:table-cell">
+                      {(habitValidatorsMap[h.id] || []).length > 0 ? (
+                        <AvatarStack userIds={habitValidatorsMap[h.id]} membersById={membersById} />
                       ) : (
                         <span className="text-gray-300 text-xs">—</span>
                       )}
