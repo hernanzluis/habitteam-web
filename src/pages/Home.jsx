@@ -113,27 +113,28 @@ export default function Home() {
           <p className="text-lg text-gray-500 mb-10 max-w-xl">
             {t('pricing.subtitle')}
           </p>
-          <div className="grid md:grid-cols-3 gap-0 border border-gray-200">
+          <div className="grid md:grid-cols-3 gap-0 border border-gray-200 md:items-stretch">
             {plans.map((plan, i) => (
               <div
                 key={i}
-                className={`p-10 ${i < plans.length - 1 ? 'border-b md:border-b-0 md:border-r border-gray-200' : ''} ${plan.featured ? 'bg-black text-white' : ''}`}
+                className={`p-10 flex flex-col justify-between ${i < plans.length - 1 ? 'border-b md:border-b-0 md:border-r border-gray-200' : ''} ${plan.featured ? 'bg-black text-white' : ''}`}
               >
-                <p className={`text-sm font-medium mb-6 ${plan.featured ? 'text-gray-400' : 'text-gray-500'}`}>
-                  {plan.name}
-                </p>
-                <div className="mb-2">
-                  <span
-                    className="font-black leading-none"
-                    style={{ fontSize: /^\d|\$|€/.test(plan.price) ? 'clamp(2.5rem, 5vw, 4rem)' : 'clamp(1.25rem, 2.5vw, 1.75rem)' }}
-                  >
-                    {plan.price}
-                  </span>
-                </div>
-                <p className={`text-sm mb-10 ${plan.featured ? 'text-gray-400' : 'text-gray-500'}`}>
-                  {plan.period}
-                </p>
-                <ul className="space-y-3 mb-10">
+                <div>
+                  <p className={`text-sm font-medium mb-6 ${plan.featured ? 'text-gray-400' : 'text-gray-500'}`}>
+                    {plan.name}
+                  </p>
+                  <div className="min-h-24 mb-2 flex flex-col justify-start">
+                    <span
+                      className="font-black leading-none"
+                      style={{ fontSize: /^\d|\$|€/.test(plan.price) ? 'clamp(2.5rem, 5vw, 4rem)' : 'clamp(1.25rem, 2.5vw, 1.75rem)' }}
+                    >
+                      {plan.price}
+                    </span>
+                    <p className={`text-sm mt-2 ${plan.featured ? 'text-gray-400' : 'text-gray-500'}`}>
+                      {plan.period}
+                    </p>
+                  </div>
+                  <ul className="space-y-3 mb-10">
                   {plan.features.map((f, fi) => (
                     <li key={fi} className="flex items-start gap-3">
                       <span className={`mt-1 w-1.5 h-1.5 rounded-full shrink-0 ${plan.featured ? 'bg-[#0A66C2]' : 'bg-gray-300'}`} />
@@ -141,6 +142,7 @@ export default function Home() {
                     </li>
                   ))}
                 </ul>
+                </div>
                 <a
                   href="/acceder"
                   className={`inline-block w-full text-center text-sm font-medium py-3 transition-colors ${
