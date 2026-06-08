@@ -295,7 +295,6 @@ export default function Habits({ companyId, adminId }) {
   const [habits, setHabits] = useState([]);
   const [categories, setCategories] = useState([]);
   const [members, setMembers] = useState([]);
-  const [assignedCounts, setAssignedCounts] = useState({});
   const [habitAssignmentsMap, setHabitAssignmentsMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -350,10 +349,8 @@ export default function Habits({ companyId, adminId }) {
       if (cErr) throw cErr;
       if (mErr) throw mErr;
 
-      const counts = {};
       const assignMap = {};
       (assignData || []).forEach(({ habit_id, user_id }) => {
-        counts[habit_id] = (counts[habit_id] || 0) + 1;
         if (!assignMap[habit_id]) assignMap[habit_id] = [];
         assignMap[habit_id].push(user_id);
       });
@@ -361,7 +358,6 @@ export default function Habits({ companyId, adminId }) {
       setHabits(habitsData || []);
       setCategories(catsData || []);
       setMembers(membersData || []);
-      setAssignedCounts(counts);
       setHabitAssignmentsMap(assignMap);
     } catch (e) {
       setError(e.message || 'Error cargando hábitos');
