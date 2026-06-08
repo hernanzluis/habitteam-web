@@ -43,8 +43,6 @@ export default function Acceder() {
     }
   };
 
-  console.log('Supabase URL:', process.env.REACT_APP_SUPABASE_URL);
-
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <nav className="px-8 py-6 max-w-7xl mx-auto w-full">
