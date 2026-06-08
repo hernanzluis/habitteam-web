@@ -12,7 +12,7 @@
     "line1": "Los hábitos",
     "line2": "que nunca",
     "line3": "lograste solo.",
-    "subtitle": "La plataforma de hábitos corporativos con validación entre compañeros.",
+    "subtitle": "La app para construir hábitos en familia, con el apoyo de los que más quieres.",
     "cta": "Empieza gratis",
     "ctaSecondary": "Ver cómo funciona →"
   },
@@ -20,16 +20,16 @@
     "title": "Cómo funciona",
     "steps": [
       {
-        "title": "Crea un equipo",
-        "description": "Invita a las personas con las que quieres crecer. Puede ser tu pareja, tu familia, tus socios o tu equipo de trabajo."
+        "title": "Crea tu grupo familiar",
+        "description": "El administrador crea el grupo e invita a cada miembro con un código personal."
       },
       {
-        "title": "Define los hábitos",
-        "description": "Elige qué queréis hacer juntos cada día. Ejercicio, lectura, meditación, deep work — lo que tenga sentido para vosotros."
+        "title": "Completad vuestros hábitos",
+        "description": "Cada miembro registra sus hábitos del día con una foto como prueba."
       },
       {
-        "title": "Marcad el check cada día",
-        "description": "Un check rápido al completarlo. Veis el progreso de todos en tiempo real y la racha del equipo crece solo cuando todos participan."
+        "title": "Validaos entre vosotros",
+        "description": "La familia valida las fotos, añade reacciones y comentarios de ánimo."
       }
     ]
   },
@@ -37,67 +37,74 @@
     "title": "Todo lo que necesitas.",
     "titleAccent": "Nada más.",
     "list": [
-      "Crea hábitos compartidos con tu equipo o familia",
-      "Seguimiento diario en tiempo real para todos los miembros",
-      "Rachas grupales que se mantienen solo si todos participan",
-      "Notificaciones inteligentes sin spam",
-      "Dashboard de progreso semanal y mensual",
-      "Hasta 10 hábitos activos por equipo en el plan gratuito",
-      "Historial completo exportable en CSV",
-      "Aplicación web progresiva, funciona en cualquier dispositivo"
+      "Validación con foto",
+      "Rachas y motivación",
+      "Hábitos personalizados",
+      "Categorías visuales",
+      "Actividad del grupo",
+      "Comentarios y reacciones",
+      "Estadísticas por hábito",
+      "Roles de administrador"
     ]
   },
   "pricing": {
     "title": "Precios",
     "subtitle": "Sin sorpresas. Sin pagos anuales obligatorios.",
     "ctaFree": "Empezar gratis",
-    "ctaPro": "Empieza con Pro",
+    "ctaPro": "Empieza con Plus",
+    "ctaContact": "Contactar",
     "plans": [
       {
-        "name": "Gratis",
+        "name": "Familiar",
         "price": "0€",
-        "period": "para siempre",
+        "period": "Para empezar en familia",
+        "featured": false,
         "features": [
-          "1 equipo hasta 5 personas",
-          "Hasta 3 hábitos activos",
-          "Historial últimos 30 días",
-          "Notificaciones básicas"
+          "Hasta 6 miembros",
+          "Hasta 10 hábitos activos",
+          "Validación con foto",
+          "Historial 30 días",
+          "Rachas y estadísticas básicas"
         ]
       },
       {
-        "name": "Pro",
+        "name": "Plus",
         "price": "4€",
-        "period": "por persona / mes",
+        "period": "Para familias más grandes",
+        "featured": true,
         "features": [
-          "Equipos ilimitados",
+          "Hasta 20 miembros",
           "Hábitos ilimitados",
           "Historial completo",
-          "Notificaciones avanzadas",
-          "Exportación CSV",
-          "Soporte prioritario"
+          "Estadísticas avanzadas",
+          "Todo lo del plan Familiar"
         ]
       },
       {
-        "name": "Equipo",
-        "price": "12€",
-        "period": "hasta 10 personas / mes",
+        "name": "Empresa",
+        "price": "A consultar",
+        "period": "Para equipos y organizaciones",
+        "featured": false,
         "features": [
-          "Todo lo de Pro",
-          "Gestión centralizada",
-          "Factura para empresa",
-          "Onboarding dedicado"
+          "Miembros ilimitados",
+          "Todo lo del plan Plus",
+          "Panel de administración web",
+          "Soporte prioritario",
+          "Precio personalizado"
         ]
       }
     ]
   },
   "cta": {
-    "line1": "¿Listo para",
-    "line2": "empezar",
-    "line3": "juntos?",
-    "button": "Crear mi equipo gratis"
+    "line1": "Empieza hoy",
+    "line2": "con tu",
+    "line3": "familia.",
+    "button": "Crear mi grupo gratis",
+    "sub1": "Gratis para siempre hasta 6 miembros.",
+    "sub2": "Sin tarjeta de crédito."
   },
   "footer": {
-    "tagline": "Construye hábitos que duran, con las personas que te importan.",
+    "tagline": "Hábitos en familia, logros compartidos.",
     "copyright": "Todos los derechos reservados.",
     "colProduct": "Producto",
     "colCompany": "Empresa",

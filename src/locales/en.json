@@ -12,7 +12,7 @@
     "line1": "The habits",
     "line2": "you never",
     "line3": "built alone.",
-    "subtitle": "The corporate habit platform with peer validation.",
+    "subtitle": "The app to build habits as a family, with the support of those you love most.",
     "cta": "Start for free",
     "ctaSecondary": "See how it works →"
   },
@@ -20,16 +20,16 @@
     "title": "How it works",
     "steps": [
       {
-        "title": "Create a team",
-        "description": "Invite the people you want to grow with. It can be your partner, your family, your co-founders or your work team."
+        "title": "Create your family group",
+        "description": "The admin creates the group and invites each member with a personal code."
       },
       {
-        "title": "Define your habits",
-        "description": "Choose what you want to do together every day. Exercise, reading, meditation, deep work — whatever makes sense for you."
+        "title": "Complete your habits",
+        "description": "Each member logs their daily habits with a photo as proof."
       },
       {
-        "title": "Check in every day",
-        "description": "A quick check when you complete it. Everyone sees real-time progress and the team streak only grows when everyone participates."
+        "title": "Validate each other",
+        "description": "The family validates photos, adds reactions and encouraging comments."
       }
     ]
   },
@@ -37,67 +37,74 @@
     "title": "Everything you need.",
     "titleAccent": "Nothing more.",
     "list": [
-      "Create shared habits with your team or family",
-      "Real-time daily tracking for all members",
-      "Group streaks that only hold when everyone participates",
-      "Smart notifications without spam",
-      "Weekly and monthly progress dashboard",
-      "Up to 10 active habits per team on the free plan",
-      "Full history exportable as CSV",
-      "Progressive web app, works on any device"
+      "Photo validation",
+      "Streaks and motivation",
+      "Custom habits",
+      "Visual categories",
+      "Group activity",
+      "Comments and reactions",
+      "Habit statistics",
+      "Admin roles"
     ]
   },
   "pricing": {
     "title": "Pricing",
     "subtitle": "No surprises. No mandatory annual payments.",
     "ctaFree": "Start for free",
-    "ctaPro": "Start with Pro",
+    "ctaPro": "Start with Plus",
+    "ctaContact": "Contact us",
     "plans": [
       {
-        "name": "Free",
+        "name": "Family",
         "price": "$0",
-        "period": "forever",
+        "period": "To get started as a family",
+        "featured": false,
         "features": [
-          "1 team up to 5 people",
-          "Up to 3 active habits",
-          "Last 30 days history",
-          "Basic notifications"
+          "Up to 6 members",
+          "Up to 10 active habits",
+          "Photo validation",
+          "30-day history",
+          "Streaks and basic stats"
         ]
       },
       {
-        "name": "Pro",
+        "name": "Plus",
         "price": "$4",
-        "period": "per person / month",
+        "period": "For larger families",
+        "featured": true,
         "features": [
-          "Unlimited teams",
+          "Up to 20 members",
           "Unlimited habits",
           "Full history",
-          "Advanced notifications",
-          "CSV export",
-          "Priority support"
+          "Advanced statistics",
+          "Everything in Family plan"
         ]
       },
       {
-        "name": "Team",
-        "price": "$12",
-        "period": "up to 10 people / month",
+        "name": "Business",
+        "price": "Contact us",
+        "period": "For teams and organizations",
+        "featured": false,
         "features": [
-          "Everything in Pro",
-          "Centralized management",
-          "Company invoice",
-          "Dedicated onboarding"
+          "Unlimited members",
+          "Everything in Plus plan",
+          "Web admin dashboard",
+          "Priority support",
+          "Custom pricing"
         ]
       }
     ]
   },
   "cta": {
-    "line1": "Ready to",
-    "line2": "start",
-    "line3": "together?",
-    "button": "Create my team for free"
+    "line1": "Start today",
+    "line2": "with your",
+    "line3": "family.",
+    "button": "Create my group for free",
+    "sub1": "Free forever up to 6 members.",
+    "sub2": "No credit card required."
   },
   "footer": {
-    "tagline": "Build habits that last, with the people who matter.",
+    "tagline": "Family habits, shared achievements.",
     "copyright": "All rights reserved.",
     "colProduct": "Product",
     "colCompany": "Company",
