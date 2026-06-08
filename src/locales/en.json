@@ -70,7 +70,7 @@
       {
         "name": "Plus",
         "price": "$4",
-        "period": "For larger families",
+        "period": "/mo",
         "featured": true,
         "features": [
           "Up to 20 members",

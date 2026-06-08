@@ -70,7 +70,7 @@
       {
         "name": "Plus",
         "price": "4€",
-        "period": "Para familias más grandes",
+        "period": "/mes",
         "featured": true,
         "features": [
           "Hasta 20 miembros",

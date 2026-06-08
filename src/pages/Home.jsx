@@ -124,15 +124,24 @@ export default function Home() {
                     {plan.name}
                   </p>
                   <div className="min-h-24 mb-2 flex flex-col justify-start">
-                    <span
-                      className="font-black leading-none"
-                      style={{ fontSize: /^\d|\$|€/.test(plan.price) ? 'clamp(2.5rem, 5vw, 4rem)' : 'clamp(1.25rem, 2.5vw, 1.75rem)' }}
-                    >
-                      {plan.price}
-                    </span>
-                    <p className={`text-sm mt-2 ${plan.featured ? 'text-gray-400' : 'text-gray-500'}`}>
-                      {plan.period}
-                    </p>
+                    <div className="flex items-baseline gap-1">
+                      <span
+                        className="font-black leading-none"
+                        style={{ fontSize: /^\d|\$|€/.test(plan.price) ? 'clamp(2.5rem, 5vw, 4rem)' : 'clamp(1.25rem, 2.5vw, 1.75rem)' }}
+                      >
+                        {plan.price}
+                      </span>
+                      {plan.period?.startsWith('/') ? (
+                        <span className={`text-sm font-medium ${plan.featured ? 'text-gray-400' : 'text-gray-500'}`}>
+                          {plan.period}
+                        </span>
+                      ) : null}
+                    </div>
+                    {!plan.period?.startsWith('/') ? (
+                      <p className={`text-sm mt-2 ${plan.featured ? 'text-gray-400' : 'text-gray-500'}`}>
+                        {plan.period}
+                      </p>
+                    ) : null}
                   </div>
                   <ul className="space-y-3 mb-10">
                   {plan.features.map((f, fi) => (
