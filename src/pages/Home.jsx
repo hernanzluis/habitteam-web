@@ -125,7 +125,7 @@ export default function Home() {
                 <div className="mb-2">
                   <span
                     className="font-black leading-none"
-                    style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)' }}
+                    style={{ fontSize: /^\d|\$|€/.test(plan.price) ? 'clamp(2.5rem, 5vw, 4rem)' : 'clamp(1.25rem, 2.5vw, 1.75rem)' }}
                   >
                     {plan.price}
                   </span>
