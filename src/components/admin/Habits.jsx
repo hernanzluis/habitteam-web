@@ -1,12 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 
 const RECURRENCE_LABELS = { daily: 'Diario', once: 'Una vez', weekly_x: 'Semanal' };
-
-function formatDate(dateStr) {
-  if (!dateStr) return '—';
-  return new Date(dateStr).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
-}
 
 export default function Habits({ companyId, adminId }) {
   const [habits, setHabits] = useState([]);
@@ -35,7 +30,7 @@ export default function Habits({ companyId, adminId }) {
   const [assignedIds, setAssignedIds] = useState([]);
   const [validatorIds, setValidatorIds] = useState([]);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
@@ -43,7 +38,7 @@ export default function Habits({ companyId, adminId }) {
         { data: habitsData, error: hErr },
         { data: catsData, error: cErr },
         { data: membersData, error: mErr },
-        { data: assignData, error: aErr },
+        { data: assignData },
       ] = await Promise.all([
         supabase.from('habits').select('id, title, description, recurrence, is_active, created_at, category_id, photo_required').eq('company_id', companyId).order('created_at', { ascending: false }),
         supabase.from('categories').select('id, name, icon, color').or(`company_id.is.null,company_id.eq.${companyId}`),
@@ -70,9 +65,9 @@ export default function Habits({ companyId, adminId }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [companyId]);
 
-  useEffect(() => { loadData(); }, [companyId]);
+  useEffect(() => { loadData(); }, [loadData]);
 
   const handleToggle = async (habit) => {
     setTogglingId(habit.id);

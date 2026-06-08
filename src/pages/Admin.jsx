@@ -4,12 +4,9 @@ import { supabase } from '../lib/supabase';
 import Members from '../components/admin/Members';
 import Habits from '../components/admin/Habits';
 
-const BLUE = '#0A66C2';
-
 export default function Admin() {
   const navigate = useNavigate();
   const [checking, setChecking] = useState(true);
-  const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [companyName, setCompanyName] = useState('');
   const [activeSection, setActiveSection] = useState('members');
@@ -33,7 +30,6 @@ export default function Admin() {
         .eq('id', prof.company_id)
         .single();
 
-      setUser(authUser);
       setProfile(prof);
       setCompanyName(company?.name || '');
       setChecking(false);

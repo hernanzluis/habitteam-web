@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 
 function generateCode() {
@@ -29,7 +29,7 @@ export default function Members({ companyId, adminId }) {
   const [deletingId, setDeletingId] = useState(null);
   const [cancellingId, setCancellingId] = useState(null);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
@@ -46,9 +46,9 @@ export default function Members({ companyId, adminId }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [companyId]);
 
-  useEffect(() => { loadData(); }, [companyId]);
+  useEffect(() => { loadData(); }, [loadData]);
 
   const openModal = () => {
     setNewName('');
