@@ -273,6 +273,7 @@ export default function Habits({ companyId, adminId }) {
   const [editingHabit, setEditingHabit] = useState(null);
   const [editSaving, setEditSaving] = useState(false);
   const [editError, setEditError] = useState('');
+  const [editLoadingAssignments, setEditLoadingAssignments] = useState(false);
 
   // Shared form state (used by both create and edit)
   const [title, setTitle] = useState('');
@@ -426,7 +427,15 @@ export default function Habits({ companyId, adminId }) {
   };
 
   // ── Edit modal ────────────────────────────────────────────────────
-  const openEditModal = (habit) => {
+  const toggleEditAssigned = (id) => {
+    setAssignedIds((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
+  };
+
+  const toggleEditValidator = (id) => {
+    setValidatorIds((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
+  };
+
+  const openEditModal = async (habit) => {
     setTitle(habit.title || '');
     setDescription(habit.description || '');
     setRecurrence(habit.recurrence || 'daily');
@@ -436,32 +445,65 @@ export default function Habits({ companyId, adminId }) {
     setDueTime(habit.due_time ? habit.due_time.slice(0, 5) : '');
     setExpiresDate(toDateInput(habit.expires_at));
     setExpiresTime(toTimeInput(habit.expires_at));
-    setAssignedIds(null);   // not shown in edit modal
-    setValidatorIds(null);  // not shown in edit modal
+    setAssignedIds([]);
+    setValidatorIds([]);
     setEditError('');
+    setEditLoadingAssignments(true);
     setEditingHabit(habit);
+
+    try {
+      const [{ data: aData }, { data: vData }] = await Promise.all([
+        supabase.from('habit_assignments').select('user_id').eq('habit_id', habit.id),
+        supabase.from('habit_validators').select('user_id').eq('habit_id', habit.id),
+      ]);
+      setAssignedIds((aData || []).map((r) => r.user_id));
+      setValidatorIds((vData || []).map((r) => r.user_id));
+    } catch {
+      // Non-critical: checkboxes start unchecked if fetch fails
+    } finally {
+      setEditLoadingAssignments(false);
+    }
   };
 
   const handleEditHabit = async (e) => {
     e.preventDefault();
     if (!title.trim()) { setEditError('El título es obligatorio'); return; }
+    if (assignedIds.length === 0) { setEditError('Asigna el hábito al menos a un miembro'); return; }
     setEditSaving(true); setEditError('');
     try {
       let expiresAt = null;
       if (recurrence === 'once' && expiresDate) {
         expiresAt = new Date(`${expiresDate}T${expiresTime || '23:59'}`).toISOString();
       }
-      const { error } = await supabase.from('habits').update({
-        title: title.trim(),
-        description: description.trim() || null,
-        recurrence,
-        weekly_target: recurrence === 'weekly_x' ? weeklyTarget : null,
-        category_id: categoryId || null,
-        photo_required: photoRequired,
-        due_time: recurrence === 'daily' && dueTime ? dueTime : null,
-        expires_at: expiresAt,
-      }).eq('id', editingHabit.id);
-      if (error) throw error;
+
+      const [updateResult, delAssign, delValidators] = await Promise.all([
+        supabase.from('habits').update({
+          title: title.trim(),
+          description: description.trim() || null,
+          recurrence,
+          weekly_target: recurrence === 'weekly_x' ? weeklyTarget : null,
+          category_id: categoryId || null,
+          photo_required: photoRequired,
+          due_time: recurrence === 'daily' && dueTime ? dueTime : null,
+          expires_at: expiresAt,
+        }).eq('id', editingHabit.id),
+        supabase.from('habit_assignments').delete().eq('habit_id', editingHabit.id),
+        supabase.from('habit_validators').delete().eq('habit_id', editingHabit.id),
+      ]);
+      if (updateResult.error) throw updateResult.error;
+      if (delAssign.error) throw delAssign.error;
+      if (delValidators.error) throw delValidators.error;
+
+      const insertOps = [];
+      if (assignedIds.length > 0) {
+        insertOps.push(supabase.from('habit_assignments').insert(assignedIds.map((user_id) => ({ habit_id: editingHabit.id, user_id }))));
+      }
+      if (validatorIds.length > 0) {
+        insertOps.push(supabase.from('habit_validators').insert(validatorIds.map((user_id) => ({ habit_id: editingHabit.id, user_id }))));
+      }
+      const results = await Promise.all(insertOps);
+      for (const { error } of results) { if (error) throw error; }
+
       setEditingHabit(null);
       loadData();
     } catch (e) {
@@ -599,22 +641,26 @@ export default function Habits({ companyId, adminId }) {
               <h3 className="text-lg font-bold text-black">Editar hábito</h3>
               <button onClick={() => setEditingHabit(null)} className="text-gray-400 hover:text-black text-xl leading-none">×</button>
             </div>
-            <HabitForm
-              title={title} setTitle={setTitle}
-              description={description} setDescription={setDescription}
-              recurrence={recurrence} setRecurrence={setRecurrence}
-              weeklyTarget={weeklyTarget} setWeeklyTarget={setWeeklyTarget}
-              dueTime={dueTime} setDueTime={setDueTime}
-              expiresDate={expiresDate} setExpiresDate={setExpiresDate}
-              expiresTime={expiresTime} setExpiresTime={setExpiresTime}
-              categoryId={categoryId} setCategoryId={setCategoryId}
-              photoRequired={photoRequired} setPhotoRequired={setPhotoRequired}
-              assignedIds={null} toggleAssigned={null}
-              validatorIds={null} toggleValidator={null}
-              members={members} categories={categories}
-              onSubmit={handleEditHabit} onCancel={() => setEditingHabit(null)}
-              saving={editSaving} modalError={editError} submitLabel="Guardar cambios"
-            />
+            {editLoadingAssignments ? (
+              <p className="text-sm text-gray-400 px-6 py-8 text-center">Cargando asignaciones...</p>
+            ) : (
+              <HabitForm
+                title={title} setTitle={setTitle}
+                description={description} setDescription={setDescription}
+                recurrence={recurrence} setRecurrence={setRecurrence}
+                weeklyTarget={weeklyTarget} setWeeklyTarget={setWeeklyTarget}
+                dueTime={dueTime} setDueTime={setDueTime}
+                expiresDate={expiresDate} setExpiresDate={setExpiresDate}
+                expiresTime={expiresTime} setExpiresTime={setExpiresTime}
+                categoryId={categoryId} setCategoryId={setCategoryId}
+                photoRequired={photoRequired} setPhotoRequired={setPhotoRequired}
+                assignedIds={assignedIds} toggleAssigned={toggleEditAssigned}
+                validatorIds={validatorIds} toggleValidator={toggleEditValidator}
+                members={members} categories={categories}
+                onSubmit={handleEditHabit} onCancel={() => setEditingHabit(null)}
+                saving={editSaving} modalError={editError} submitLabel="Guardar cambios"
+              />
+            )}
           </div>
         </div>
       ) : null}
