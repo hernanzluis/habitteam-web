@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import Members from '../components/admin/Members';
 import Habits from '../components/admin/Habits';
+import Categories from '../components/admin/Categories';
 
 export default function Admin() {
   const navigate = useNavigate();
@@ -52,8 +53,9 @@ export default function Admin() {
   }
 
   const navItems = [
-    { key: 'members', label: 'Miembros' },
-    { key: 'habits',  label: 'Hábitos'  },
+    { key: 'members',    label: 'Miembros'    },
+    { key: 'habits',     label: 'Hábitos'     },
+    { key: 'categories', label: 'Categorías'  },
   ];
 
   return (
@@ -124,6 +126,9 @@ export default function Admin() {
             )}
             {activeSection === 'habits' && (
               <Habits companyId={profile.company_id} adminId={profile.id} />
+            )}
+            {activeSection === 'categories' && (
+              <Categories companyId={profile.company_id} />
             )}
           </div>
         </main>
