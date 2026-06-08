@@ -10,7 +10,7 @@ export default function Admin() {
   const [checking, setChecking] = useState(true);
   const [profile, setProfile] = useState(null);
   const [companyName, setCompanyName] = useState('');
-  const [activeSection, setActiveSection] = useState('members');
+  const [activeSection, setActiveSection] = useState('habits');
 
   useEffect(() => {
     const checkAuth = async () => {
