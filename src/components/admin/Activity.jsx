@@ -75,7 +75,7 @@ export default function Activity({ companyId }) {
 
       const [
         { data: membersData, error: mErr },
-        { data: habitsData, error: hErr },
+        { error: hErr },
         { data: assignmentsData, error: aErr },
       ] = await Promise.all([
         supabase.from('profiles').select('id, full_name, avatar_url').eq('company_id', companyId),
