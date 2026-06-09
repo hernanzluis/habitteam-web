@@ -22,7 +22,7 @@ export default function Home() {
           <br />
           {t('hero.line2')}
           <br />
-          <span className="text-[#0A66C2]">{t('hero.line3')}</span>
+          <span className="text-red-600">{t('hero.line3')}</span>
         </h1>
         <p className="mt-10 text-lg text-gray-500 pl-1 leading-relaxed">
           {t('hero.subtitle')}
