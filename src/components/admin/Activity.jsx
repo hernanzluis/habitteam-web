@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 
 function getWeekStart() {
@@ -59,6 +60,7 @@ function timeAgo(dateStr) {
 const DAY_LABELS = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
 
 export default function Activity({ companyId }) {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [members, setMembers] = useState([]);
@@ -216,7 +218,8 @@ export default function Activity({ companyId }) {
             return (
               <div
                 key={member.id}
-                className={`bg-white border p-4 space-y-3 ${inactive ? 'border-orange-400' : 'border-gray-200'}`}
+                onClick={() => navigate('/admin/miembro/' + member.id)}
+                className={`bg-white border p-4 space-y-3 cursor-pointer hover:shadow-sm transition-shadow ${inactive ? 'border-orange-400' : 'border-gray-200'}`}
               >
                 {/* Header */}
                 <div className="flex items-center gap-3">
