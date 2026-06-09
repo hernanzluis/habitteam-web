@@ -113,6 +113,9 @@
     "colProduct": "Product",
     "colCompany": "Company",
     "colLegal": "Legal",
+    "legalPrivacy": "Privacy",
+    "legalTerms": "Terms",
+    "legalCookies": "Cookies",
     "product": ["How it works", "Features", "Pricing", "What's new"],
     "company": ["About us", "Blog", "Contact"],
     "legal": ["Privacy", "Terms", "Cookies"]

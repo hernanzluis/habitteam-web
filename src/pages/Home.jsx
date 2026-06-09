@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import Nav from '../components/Nav';
 
 export default function Home() {
@@ -242,13 +243,21 @@ export default function Home() {
               {t('footer.colLegal')}
             </p>
             <ul className="space-y-3">
-              {t('footer.legal', { returnObjects: true }).map((item) => (
-                <li key={item}>
-                  <button className="text-sm text-gray-600 hover:text-black transition-colors text-left">
-                    {item}
-                  </button>
-                </li>
-              ))}
+              <li>
+                <Link to="/privacidad" className="text-sm text-gray-600 hover:text-black transition-colors">
+                  {t('footer.legalPrivacy')}
+                </Link>
+              </li>
+              <li>
+                <Link to="/terminos" className="text-sm text-gray-600 hover:text-black transition-colors">
+                  {t('footer.legalTerms')}
+                </Link>
+              </li>
+              <li>
+                <Link to="/cookies" className="text-sm text-gray-600 hover:text-black transition-colors">
+                  {t('footer.legalCookies')}
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
