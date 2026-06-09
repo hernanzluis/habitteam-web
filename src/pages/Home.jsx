@@ -12,7 +12,7 @@ export default function Home() {
     <div className="bg-white text-black min-h-screen">
       {/* Banner desarrollo */}
       <div className="fixed top-0 left-0 right-0 z-[60] w-full py-2 text-center text-sm text-white" style={{ backgroundColor: '#0A66C2' }}>
-        🚧 {t('banner.dev_text')}
+        ✨ {t('banner.dev_text')}
         <a
           href={`mailto:hernanz.luis@gmail.com?subject=${encodeURIComponent('Lista de espera HabitTeam')}&body=${encodeURIComponent('Hola, me interesa HabitTeam y quiero estar en la lista de espera.')}`}
           className="underline text-white hover:opacity-80 transition-opacity"
@@ -32,7 +32,7 @@ export default function Home() {
           <br />
           {t('hero.line2')}
           <br />
-          <span className="text-red-600">{t('hero.line3')}</span>
+          <span className="text-[#0A66C2]">{t('hero.line3')}</span>
         </h1>
         <p className="mt-10 text-lg text-gray-500 pl-1 leading-relaxed">
           {t('hero.subtitle')}
