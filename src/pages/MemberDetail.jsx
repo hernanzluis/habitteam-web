@@ -300,14 +300,15 @@ export default function MemberDetail() {
                       <div key={habit.id} className="bg-white border border-gray-200 p-5">
                         {/* Habit header */}
                         <div className="flex items-center gap-3 mb-3">
-                          {habit.category && (
-                            <span
-                              className="w-8 h-8 rounded-full flex items-center justify-center text-base shrink-0"
-                              style={{ backgroundColor: habit.category.color + '22' }}
-                            >
-                              {habit.category.icon}
-                            </span>
-                          )}
+                          <span style={{
+                            display: 'inline-block',
+                            width: '12px',
+                            height: '12px',
+                            borderRadius: '50%',
+                            backgroundColor: habit.category?.color || '#9E9E9E',
+                            marginRight: '6px',
+                            flexShrink: 0,
+                          }} />
                           <div>
                             <p className="text-sm font-bold text-black">{habit.title}</p>
                             <p className="text-xs text-gray-400">
