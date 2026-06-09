@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 const NAV_HEIGHT = 88;
@@ -7,6 +7,9 @@ const NAV_HEIGHT = 88;
 export default function Nav() {
   const { t, i18n } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isHome = location.pathname === '/';
 
   const links = [
     { label: t('nav.howItWorks'), href: '#como-funciona' },
@@ -17,10 +20,14 @@ export default function Nav() {
   function handleNavClick(e, href) {
     e.preventDefault();
     setMenuOpen(false);
-    const el = document.querySelector(href);
-    if (el) {
-      const top = el.getBoundingClientRect().top + window.scrollY - NAV_HEIGHT;
-      window.scrollTo({ top, behavior: 'smooth' });
+    if (isHome) {
+      const el = document.querySelector(href);
+      if (el) {
+        const top = el.getBoundingClientRect().top + window.scrollY - NAV_HEIGHT;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    } else {
+      navigate('/' + href);
     }
   }
 
