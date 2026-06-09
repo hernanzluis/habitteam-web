@@ -102,6 +102,24 @@ export default function Members({ companyId, adminId }) {
     }
   };
 
+  const handleChangeRole = async (member, newRole) => {
+    if (newRole === member.role) return;
+    if (member.role === 'admin' && newRole !== 'admin') {
+      const adminCount = members.filter((m) => m.role === 'admin').length;
+      if (adminCount <= 1) {
+        alert('Debe haber al menos un administrador en el grupo.');
+        return;
+      }
+    }
+    try {
+      const { error } = await supabase.from('profiles').update({ role: newRole }).eq('id', member.id);
+      if (error) throw error;
+      setMembers((prev) => prev.map((m) => m.id === member.id ? { ...m, role: newRole } : m));
+    } catch (e) {
+      alert(e.message || 'No se pudo cambiar el rol.');
+    }
+  };
+
   const handleCancelInvite = async (invite) => {
     if (!window.confirm(`¿Cancelar la invitación de ${invite.full_name}?`)) return;
     setCancellingId(invite.id);
@@ -155,11 +173,22 @@ export default function Members({ companyId, adminId }) {
                     <td className="px-4 py-3 font-medium text-black">{m.full_name}</td>
                     <td className="px-4 py-3 text-gray-500 hidden sm:table-cell">{m.email}</td>
                     <td className="px-4 py-3 hidden md:table-cell">
-                      <span className={`inline-block px-2 py-0.5 text-xs font-semibold rounded-full ${
-                        m.role === 'admin' ? 'bg-blue-50 text-[#0A66C2]' : 'bg-gray-100 text-gray-600'
-                      }`}>
-                        {m.role === 'admin' ? 'Admin' : 'Miembro'}
-                      </span>
+                      {m.id === adminId ? (
+                        <span className={`inline-block px-2 py-0.5 text-xs font-semibold rounded-full ${
+                          m.role === 'admin' ? 'bg-blue-50 text-[#0A66C2]' : 'bg-gray-100 text-gray-600'
+                        }`}>
+                          {m.role === 'admin' ? 'Admin' : 'Miembro'}
+                        </span>
+                      ) : (
+                        <select
+                          value={m.role}
+                          onChange={(e) => handleChangeRole(m, e.target.value)}
+                          className="text-xs border border-gray-200 rounded px-2 py-1 text-gray-700 bg-white focus:outline-none focus:border-black transition-colors"
+                        >
+                          <option value="user">Miembro</option>
+                          <option value="admin">Administrador</option>
+                        </select>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-gray-400 hidden lg:table-cell">{formatDate(m.created_at)}</td>
                     <td className="px-4 py-3 text-right">
