@@ -10,6 +10,16 @@ export default function Home() {
 
   return (
     <div className="bg-white text-black min-h-screen">
+      {/* Banner desarrollo */}
+      <div className="w-full py-2 text-center text-sm text-white" style={{ backgroundColor: '#0A66C2' }}>
+        🚧 {t('banner.dev_text')}
+        <a
+          href={`mailto:hernanz.luis@gmail.com?subject=${encodeURIComponent('Lista de espera HabitTeam')}&body=${encodeURIComponent('Hola, me interesa HabitTeam y quiero estar en la lista de espera.')}`}
+          className="underline text-white hover:opacity-80 transition-opacity"
+        >
+          {t('banner.waitlist')}
+        </a>
+      </div>
       <Nav />
 
       {/* Hero */}

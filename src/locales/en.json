@@ -1,4 +1,8 @@
 {
+  "banner": {
+    "dev_text": "Product in development — ",
+    "waitlist": "Join the waitlist"
+  },
   "nav": {
     "brand": "HabitTeam",
     "howItWorks": "How it works",

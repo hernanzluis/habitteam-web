@@ -1,4 +1,8 @@
 {
+  "banner": {
+    "dev_text": "Producto en desarrollo — ",
+    "waitlist": "Únete a la lista de espera"
+  },
   "nav": {
     "brand": "HabitTeam",
     "howItWorks": "Cómo funciona",
