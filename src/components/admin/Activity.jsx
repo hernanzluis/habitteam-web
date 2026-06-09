@@ -34,17 +34,21 @@ function calculateStreak(logs, userId) {
   return streak;
 }
 
-function getWeekDots(logs, userId) {
+function getWeekDots(logs, userId, validatedLogIds) {
   const weekStart = getWeekStart();
   const dots = [];
   for (let i = 0; i < 7; i++) {
     const day = new Date(weekStart);
     day.setDate(weekStart.getDate() + i);
     const dayStr = day.toDateString();
-    const hasLog = logs.some(
+    const dayLogs = logs.filter(
       (l) => l.user_id === userId && new Date(l.created_at).toDateString() === dayStr
     );
-    dots.push(hasLog);
+    let state = 'none';
+    if (dayLogs.length > 0) {
+      state = dayLogs.some((l) => validatedLogIds.has(l.id)) ? 'validated' : 'pending';
+    }
+    dots.push(state);
   }
   return dots;
 }
@@ -67,6 +71,7 @@ export default function Activity({ companyId }) {
   const [logs, setLogs] = useState([]);
   const [assignments, setAssignments] = useState([]);
   const [pendingCount, setPendingCount] = useState(0);
+  const [validatedLogIds, setValidatedLogIds] = useState(new Set());
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -118,11 +123,16 @@ export default function Activity({ companyId }) {
         if (logIds.length > 0) {
           const { data: vd, error: vErr } = await supabase
             .from('habit_validations')
-            .select('id')
+            .select('id, habit_log_id, status')
             .in('habit_log_id', logIds)
-            .eq('status', 'pending');
+            .in('status', ['pending', 'validated']);
           if (vErr) throw vErr;
-          pendingValidationsCount = (vd || []).length;
+          const allValidations = vd || [];
+          pendingValidationsCount = allValidations.filter((v) => v.status === 'pending').length;
+          const validatedIds = new Set(
+            allValidations.filter((v) => v.status === 'validated').map((v) => v.habit_log_id)
+          );
+          setValidatedLogIds(validatedIds);
         }
       }
 
@@ -201,7 +211,7 @@ export default function Activity({ companyId }) {
             const memberLogs = logs.filter((l) => l.user_id === member.id);
             const todayMemberLogs = memberLogs.filter((l) => new Date(l.created_at) >= todayStart);
             const streak = calculateStreak(logs, member.id);
-            const dots = getWeekDots(logs, member.id);
+            const dots = getWeekDots(logs, member.id, validatedLogIds);
             const lastLog = memberLogs.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
             const lastActivity = lastLog ? timeAgo(lastLog.created_at) : null;
             const lastPhoto = memberLogs
@@ -270,10 +280,16 @@ export default function Activity({ companyId }) {
 
                 {/* Dots semana */}
                 <div className="flex items-center gap-1.5">
-                  {dots.map((active, i) => (
+                  {dots.map((state, i) => (
                     <div key={i} className="flex flex-col items-center gap-0.5">
                       <div
-                        className={`w-5 h-5 rounded-full ${active ? 'bg-green-500' : 'bg-gray-100'}`}
+                        className="w-5 h-5 rounded-full"
+                        style={{
+                          backgroundColor:
+                            state === 'validated' ? '#22C55E'
+                            : state === 'pending' ? '#F59E0B'
+                            : '#E5E7EB',
+                        }}
                       />
                       <span className="text-[10px] text-gray-400">{DAY_LABELS[i]}</span>
                     </div>

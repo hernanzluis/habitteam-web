@@ -18,24 +18,31 @@ function calculateStreak(logs, habitId) {
   return streak;
 }
 
-function getCalendarDays(year, month, logs, habitId) {
-  const habitLogs = new Set(
-    logs
-      .filter((l) => l.habit_id === habitId)
-      .map((l) => {
-        const d = new Date(l.created_at);
-        return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-      })
-  );
+function getCalendarDays(year, month, logs, habitId, validatedLogIds) {
+  const dayLogMap = {};
+  logs
+    .filter((l) => l.habit_id === habitId)
+    .forEach((l) => {
+      const d = new Date(l.created_at);
+      const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+      if (!dayLogMap[key]) dayLogMap[key] = [];
+      dayLogMap[key].push(l.id);
+    });
+
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
   const days = [];
-  // Padding: start from Monday (0=Mon offset)
   let startDow = firstDay.getDay();
   startDow = startDow === 0 ? 6 : startDow - 1;
   for (let i = 0; i < startDow; i++) days.push(null);
   for (let d = 1; d <= lastDay.getDate(); d++) {
-    days.push({ day: d, hasLog: habitLogs.has(`${year}-${month}-${d}`) });
+    const key = `${year}-${month}-${d}`;
+    const dayIds = dayLogMap[key] || [];
+    let state = 'none';
+    if (dayIds.length > 0) {
+      state = dayIds.some((id) => validatedLogIds.has(id)) ? 'validated' : 'pending';
+    }
+    days.push({ day: d, state });
   }
   return days;
 }
@@ -58,12 +65,12 @@ function timeAgo(dateStr) {
 const MONTH_NAMES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const DAY_LABELS = ['L','M','X','J','V','S','D'];
 
-function HabitCalendar({ logs, habitId }) {
+function HabitCalendar({ logs, habitId, validatedLogIds }) {
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth());
 
-  const days = getCalendarDays(year, month, logs, habitId);
+  const days = getCalendarDays(year, month, logs, habitId, validatedLogIds);
 
   const prev = () => {
     if (month === 0) { setYear(y => y - 1); setMonth(11); }
@@ -93,14 +100,34 @@ function HabitCalendar({ logs, habitId }) {
           ) : (
             <div
               key={cell.day}
-              className={`aspect-square rounded-full flex items-center justify-center text-[11px] font-medium mx-auto w-6 h-6 ${
-                cell.hasLog ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-400'
-              }`}
+              className="aspect-square rounded-full flex items-center justify-center text-[11px] font-medium mx-auto w-6 h-6"
+              style={{
+                backgroundColor:
+                  cell.state === 'validated' ? '#22C55E'
+                  : cell.state === 'pending' ? '#F59E0B'
+                  : '#E5E7EB',
+                color: cell.state === 'none' ? '#9CA3AF' : '#fff',
+              }}
             >
               {cell.day}
             </div>
           )
         )}
+      </div>
+      {/* Leyenda */}
+      <div className="flex items-center gap-4 mt-3">
+        <span className="flex items-center gap-1.5 text-[11px] text-gray-400">
+          <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ backgroundColor: '#E5E7EB' }} />
+          Sin actividad
+        </span>
+        <span className="flex items-center gap-1.5 text-[11px] text-gray-400">
+          <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ backgroundColor: '#F59E0B' }} />
+          Pendiente
+        </span>
+        <span className="flex items-center gap-1.5 text-[11px] text-gray-400">
+          <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ backgroundColor: '#22C55E' }} />
+          Validado
+        </span>
       </div>
     </div>
   );
@@ -116,6 +143,7 @@ export default function MemberDetail() {
   const [habits, setHabits] = useState([]);
   const [logs, setLogs] = useState([]);
   const [validations, setValidations] = useState([]);
+  const [validatedLogIds, setValidatedLogIds] = useState(new Set());
   const [lightboxUrl, setLightboxUrl] = useState(null);
 
   useEffect(() => {
@@ -181,8 +209,7 @@ export default function MemberDetail() {
           .from('habit_validations')
           .select('id, habit_log_id, validator_id, status, reaction, comment, created_at')
           .in('habit_log_id', logIds)
-          .order('created_at', { ascending: false })
-          .limit(50);
+          .order('created_at', { ascending: false });
         if (vErr) throw vErr;
         validationsData = vd || [];
         validatorIds = [...new Set(validationsData.map((v) => v.validator_id))];
@@ -206,10 +233,15 @@ export default function MemberDetail() {
         validatorName: namesMap[v.validator_id] || 'Desconocido',
       }));
 
+      const validatedIds = new Set(
+        validationsData.filter((v) => v.status === 'validated').map((v) => v.habit_log_id)
+      );
+
       setMember(profileData);
       setHabits(enrichedHabits);
       setLogs(logsData || []);
       setValidations(enrichedValidations);
+      setValidatedLogIds(validatedIds);
     } catch (e) {
       setError(e.message || 'Error cargando datos del miembro');
     } finally {
@@ -318,7 +350,7 @@ export default function MemberDetail() {
                         </div>
 
                         {/* Calendario */}
-                        <HabitCalendar logs={logs} habitId={habit.id} />
+                        <HabitCalendar logs={logs} habitId={habit.id} validatedLogIds={validatedLogIds} />
 
                         {/* Fotos */}
                         {photos.length > 0 && (
