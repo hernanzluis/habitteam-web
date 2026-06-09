@@ -270,7 +270,7 @@ export default function MemberDetail() {
           ← Volver
         </button>
         <span className="text-gray-200">|</span>
-        <span className="text-lg font-black text-black tracking-tight">HabitTeam</span>
+        <a href="/" className="text-lg font-black text-black tracking-tight hover:opacity-70 transition-opacity">HabitTeam</a>
       </header>
 
       <div className="max-w-3xl mx-auto px-4 py-8 space-y-8">
