@@ -116,7 +116,6 @@ export default function MemberDetail() {
   const [habits, setHabits] = useState([]);
   const [logs, setLogs] = useState([]);
   const [validations, setValidations] = useState([]);
-  const [validatorNames, setValidatorNames] = useState({});
   const [lightboxUrl, setLightboxUrl] = useState(null);
 
   useEffect(() => {
@@ -211,7 +210,6 @@ export default function MemberDetail() {
       setHabits(enrichedHabits);
       setLogs(logsData || []);
       setValidations(enrichedValidations);
-      setValidatorNames(namesMap);
     } catch (e) {
       setError(e.message || 'Error cargando datos del miembro');
     } finally {
