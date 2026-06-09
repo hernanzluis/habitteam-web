@@ -34,7 +34,7 @@ export default function Nav() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white">
       <div className="flex items-center justify-between px-8 py-6 max-w-7xl mx-auto">
-        <Link to="/" className="text-xl font-bold text-black tracking-tight">
+        <Link to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-xl font-bold text-black tracking-tight">
           {t('nav.brand')}
         </Link>
 
