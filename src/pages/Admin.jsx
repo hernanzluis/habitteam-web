@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import Activity from '../components/admin/Activity';
 import Members from '../components/admin/Members';
 import Habits from '../components/admin/Habits';
 import Categories from '../components/admin/Categories';
@@ -10,7 +11,7 @@ export default function Admin() {
   const [checking, setChecking] = useState(true);
   const [profile, setProfile] = useState(null);
   const [companyName, setCompanyName] = useState('');
-  const [activeSection, setActiveSection] = useState('habits');
+  const [activeSection, setActiveSection] = useState('activity');
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -53,6 +54,7 @@ export default function Admin() {
   }
 
   const navItems = [
+    { key: 'activity',   label: 'Actividad'   },
     { key: 'members',    label: 'Miembros'    },
     { key: 'habits',     label: 'Hábitos'     },
     { key: 'categories', label: 'Categorías'  },
@@ -121,6 +123,9 @@ export default function Admin() {
           </div>
 
           <div className="p-6">
+            {activeSection === 'activity' && (
+              <Activity companyId={profile.company_id} />
+            )}
             {activeSection === 'members' && (
               <Members companyId={profile.company_id} adminId={profile.id} />
             )}
