@@ -75,30 +75,41 @@ export default function Activity({ companyId }) {
 
       const [
         { data: membersData, error: mErr },
-        { error: hErr },
-        { data: assignmentsData, error: aErr },
+        { data: habitsData, error: hErr },
       ] = await Promise.all([
         supabase.from('profiles').select('id, full_name, avatar_url').eq('company_id', companyId),
         supabase.from('habits').select('id').eq('company_id', companyId).eq('is_active', true),
-        supabase.from('habit_assignments').select('habit_id, user_id').eq('company_id', companyId),
       ]);
 
       if (mErr) throw mErr;
       if (hErr) throw hErr;
-      if (aErr) throw aErr;
 
       const memberIds = (membersData || []).map((m) => m.id);
+      const habitIds = (habitsData || []).map((h) => h.id);
 
+      let assignmentsData = [];
       let logsData = [];
       let pendingValidationsCount = 0;
 
-      if (memberIds.length > 0) {
-        const { data: ld, error: lErr } = await supabase
-          .from('habit_logs')
-          .select('id, habit_id, user_id, photo_url, status, created_at')
-          .in('user_id', memberIds)
-          .gte('created_at', thirtyDaysAgo.toISOString());
+      if (habitIds.length > 0 || memberIds.length > 0) {
+        const tanda2 = await Promise.all([
+          habitIds.length > 0
+            ? supabase.from('habit_assignments').select('habit_id, user_id').in('habit_id', habitIds)
+            : Promise.resolve({ data: [], error: null }),
+          memberIds.length > 0
+            ? supabase
+                .from('habit_logs')
+                .select('id, habit_id, user_id, photo_url, status, created_at')
+                .in('user_id', memberIds)
+                .gte('created_at', thirtyDaysAgo.toISOString())
+            : Promise.resolve({ data: [], error: null }),
+        ]);
+
+        const [{ data: aData, error: aErr }, { data: ld, error: lErr }] = tanda2;
+        if (aErr) throw aErr;
         if (lErr) throw lErr;
+
+        assignmentsData = aData || [];
         logsData = ld || [];
 
         const logIds = logsData.map((l) => l.id);
