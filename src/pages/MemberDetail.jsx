@@ -349,30 +349,49 @@ export default function MemberDetail() {
                           </div>
                         </div>
 
-                        {/* Calendario */}
-                        <HabitCalendar logs={logs} habitId={habit.id} validatedLogIds={validatedLogIds} />
-
-                        {/* Fotos */}
-                        {photos.length > 0 && (
-                          <div className="mt-4">
-                            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Últimas fotos</p>
-                            <div className="flex gap-2">
-                              {photos.map((log) => (
-                                <button
-                                  key={log.id}
-                                  onClick={() => setLightboxUrl(log.photo_url)}
-                                  className="flex flex-col items-center gap-1"
-                                >
-                                  <img
-                                    src={log.photo_url}
-                                    alt="foto"
-                                    className="w-16 h-16 object-cover rounded border border-gray-200 hover:opacity-80 transition-opacity"
-                                  />
-                                  <span className="text-[10px] text-gray-400">{formatDate(log.created_at)}</span>
-                                </button>
-                              ))}
-                            </div>
+                        {/* Calendario / indicador según recurrence */}
+                        {habit.recurrence === 'once' ? (
+                          <div className="flex items-center gap-2 mt-1">
+                            {habitLogs.length > 0 ? (
+                              <>
+                                <span className="text-green-500 font-bold text-base">✓</span>
+                                <span className="text-sm text-green-600 font-semibold">Completado</span>
+                                <span className="text-xs text-gray-400">{formatDate(habitLogs[habitLogs.length - 1].created_at)}</span>
+                              </>
+                            ) : (
+                              <>
+                                <span className="inline-block w-3 h-3 rounded-full bg-gray-300" />
+                                <span className="text-sm text-gray-400">Pendiente</span>
+                              </>
+                            )}
                           </div>
+                        ) : (
+                          <>
+                            <HabitCalendar logs={logs} habitId={habit.id} validatedLogIds={validatedLogIds} />
+
+                            {/* Fotos */}
+                            {photos.length > 0 && (
+                              <div className="mt-4">
+                                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Últimas fotos</p>
+                                <div className="flex gap-2">
+                                  {photos.map((log) => (
+                                    <button
+                                      key={log.id}
+                                      onClick={() => setLightboxUrl(log.photo_url)}
+                                      className="flex flex-col items-center gap-1"
+                                    >
+                                      <img
+                                        src={log.photo_url}
+                                        alt="foto"
+                                        className="w-16 h-16 object-cover rounded border border-gray-200 hover:opacity-80 transition-opacity"
+                                      />
+                                      <span className="text-[10px] text-gray-400">{formatDate(log.created_at)}</span>
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </>
                         )}
                       </div>
                     );
