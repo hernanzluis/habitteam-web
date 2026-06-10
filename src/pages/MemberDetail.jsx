@@ -18,6 +18,39 @@ function calculateStreak(logs, habitId) {
   return streak;
 }
 
+function getMondayKey(date) {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  const dow = d.getDay();
+  d.setDate(d.getDate() - (dow === 0 ? 6 : dow - 1));
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+}
+
+function calculateWeeklyStreakForMember(logs, habitId, weeklyTarget) {
+  const habitLogs = logs.filter((l) => l.habit_id === habitId);
+  if (!habitLogs.length) return 0;
+  const weekCountMap = {};
+  habitLogs.forEach((l) => {
+    const key = getMondayKey(new Date(l.created_at));
+    weekCountMap[key] = (weekCountMap[key] || 0) + 1;
+  });
+  let streak = 0;
+  const cursor = new Date();
+  cursor.setHours(0, 0, 0, 0);
+  const dow = cursor.getDay();
+  cursor.setDate(cursor.getDate() - (dow === 0 ? 6 : dow - 1));
+  while (true) {
+    const key = `${cursor.getFullYear()}-${cursor.getMonth()}-${cursor.getDate()}`;
+    if ((weekCountMap[key] || 0) >= weeklyTarget) {
+      streak++;
+      cursor.setDate(cursor.getDate() - 7);
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
 function getCalendarDays(year, month, logs, habitId, validatedLogIds) {
   const dayLogMap = {};
   logs
@@ -320,7 +353,11 @@ export default function MemberDetail() {
                 <div className="space-y-4">
                   {habits.map((habit) => {
                     const habitLogs = logs.filter((l) => l.habit_id === habit.id);
-                    const streak = calculateStreak(logs, habit.id);
+                    const isWeekly = habit.recurrence === 'weekly_x';
+                    const streak = isWeekly
+                      ? calculateWeeklyStreakForMember(logs, habit.id, habit.weekly_target || 1)
+                      : calculateStreak(logs, habit.id);
+                    const streakLabel = isWeekly ? `${streak} sem. de racha` : `${streak} días de racha`;
                     const photos = habitLogs
                       .filter((l) => l.photo_url)
                       .slice(0, 3);
@@ -343,8 +380,14 @@ export default function MemberDetail() {
                           }} />
                           <div>
                             <p className="text-sm font-bold text-black">{habit.title}</p>
+                            {isWeekly && (
+                              <p className="text-xs text-gray-400">{habit.weekly_target || 1} veces/sem</p>
+                            )}
+                            {habit.recurrence === 'once' && (
+                              <p className="text-xs text-gray-400">Única vez</p>
+                            )}
                             <p className="text-xs text-gray-400">
-                              {habit.category?.name || 'Sin categoría'} · 🔥 {streak} días de racha · {habitLogs.length} completados ({completionRate}%)
+                              {habit.category?.name || 'Sin categoría'} · 🔥 {streakLabel} · {habitLogs.length} completados ({completionRate}%)
                             </p>
                           </div>
                         </div>
