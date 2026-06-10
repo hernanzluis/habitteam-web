@@ -92,7 +92,7 @@ export default function Members({ companyId, adminId }) {
     if (!window.confirm(`¿Eliminar a ${member.full_name}? Esta acción no se puede deshacer.`)) return;
     setDeletingId(member.id);
     try {
-      const { error } = await supabase.from('profiles').delete().eq('id', member.id);
+      const { error } = await supabase.rpc('delete_member', { member_id: member.id });
       if (error) throw error;
       setMembers((prev) => prev.filter((m) => m.id !== member.id));
     } catch (e) {
