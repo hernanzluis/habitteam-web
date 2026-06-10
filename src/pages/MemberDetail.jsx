@@ -183,7 +183,7 @@ export default function MemberDetail() {
         { data: logsData, error: lErr },
       ] = await Promise.all([
         habitIds.length > 0
-          ? supabase.from('habits').select('id, title, recurrence, weekly_target, category_id').in('id', habitIds)
+          ? supabase.from('habits').select('id, title, recurrence, weekly_target, category_id, expires_at').in('id', habitIds)
           : Promise.resolve({ data: [], error: null }),
         supabase.from('categories').select('id, name, icon, color'),
         supabase.from('habit_logs').select('id, habit_id, photo_url, status, created_at').eq('user_id', userId).order('created_at', { ascending: false }),
@@ -351,19 +351,26 @@ export default function MemberDetail() {
 
                         {/* Calendario / indicador según recurrence */}
                         {habit.recurrence === 'once' ? (
-                          <div className="flex items-center gap-2 mt-1">
-                            {habitLogs.length > 0 ? (
-                              <>
-                                <span className="text-green-500 font-bold text-base">✓</span>
-                                <span className="text-sm text-green-600 font-semibold">Completado</span>
-                                <span className="text-xs text-gray-400">{formatDate(habitLogs[habitLogs.length - 1].created_at)}</span>
-                              </>
-                            ) : (
-                              <>
-                                <span className="inline-block w-3 h-3 rounded-full bg-gray-300" />
-                                <span className="text-sm text-gray-400">Pendiente</span>
-                              </>
+                          <div className="mt-1">
+                            {habit.expires_at && (
+                              <p className="text-sm text-gray-500 mb-2">
+                                Fecha límite: {new Date(habit.expires_at).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                              </p>
                             )}
+                            <div className="flex items-center gap-2">
+                              {habitLogs.length > 0 ? (
+                                <>
+                                  <span className="text-green-500 font-bold text-base">✓</span>
+                                  <span className="text-sm text-green-600 font-semibold">Completado</span>
+                                  <span className="text-xs text-gray-400">{formatDate(habitLogs[habitLogs.length - 1].created_at)}</span>
+                                </>
+                              ) : (
+                                <>
+                                  <span className="inline-block w-3 h-3 rounded-full bg-gray-300" />
+                                  <span className="text-sm text-gray-400">Pendiente</span>
+                                </>
+                              )}
+                            </div>
                           </div>
                         ) : (
                           <>
