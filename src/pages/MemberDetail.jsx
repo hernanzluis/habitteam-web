@@ -2,6 +2,27 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 
+function toDateKey(d) {
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+}
+
+function calculateTotalCompleted(habitLogs, recurrence, weeklyTarget) {
+  if (!habitLogs.length) return 0;
+  if (recurrence === 'daily' || recurrence === 'once') {
+    return new Set(habitLogs.map((l) => toDateKey(new Date(l.created_at)))).size;
+  }
+  if (recurrence === 'weekly_x') {
+    const wTarget = weeklyTarget || 1;
+    const weekCountMap = {};
+    habitLogs.forEach((l) => {
+      const k = getMondayKey(new Date(l.created_at));
+      weekCountMap[k] = (weekCountMap[k] || 0) + 1;
+    });
+    return Object.values(weekCountMap).filter((c) => c >= wTarget).length;
+  }
+  return 0;
+}
+
 function calculateStreak(logs, habitId) {
   const days = new Set(
     logs
@@ -177,6 +198,7 @@ export default function MemberDetail() {
   const [logs, setLogs] = useState([]);
   const [validations, setValidations] = useState([]);
   const [validatedLogIds, setValidatedLogIds] = useState(new Set());
+  const [rewardsMap, setRewardsMap] = useState({});
   const [lightboxUrl, setLightboxUrl] = useState(null);
 
   useEffect(() => {
@@ -214,16 +236,28 @@ export default function MemberDetail() {
         { data: habitsData, error: hErr },
         { data: categoriesData, error: cErr },
         { data: logsData, error: lErr },
+        { data: rewardsData, error: rErr },
       ] = await Promise.all([
         habitIds.length > 0
           ? supabase.from('habits').select('id, title, recurrence, weekly_target, category_id, expires_at').in('id', habitIds)
           : Promise.resolve({ data: [], error: null }),
         supabase.from('categories').select('id, name, icon, color'),
         supabase.from('habit_logs').select('id, habit_id, photo_url, status, created_at').eq('user_id', userId).order('created_at', { ascending: false }),
+        habitIds.length > 0
+          ? supabase.from('habit_rewards').select('habit_id, streak_target, description').in('habit_id', habitIds).order('streak_target')
+          : Promise.resolve({ data: [], error: null }),
       ]);
       if (hErr) throw hErr;
       if (cErr) throw cErr;
       if (lErr) throw lErr;
+      if (rErr) throw rErr;
+
+      const rewardsMapLocal = {};
+      (rewardsData || []).forEach((r) => {
+        if (!rewardsMapLocal[r.habit_id]) rewardsMapLocal[r.habit_id] = [];
+        rewardsMapLocal[r.habit_id].push(r);
+      });
+      setRewardsMap(rewardsMapLocal);
 
       const categoryMap = {};
       (categoriesData || []).forEach((c) => { categoryMap[c.id] = c; });
@@ -443,6 +477,35 @@ export default function MemberDetail() {
                             )}
                           </>
                         )}
+
+                        {/* Recompensas */}
+                        {(rewardsMap[habit.id] || []).length > 0 && (() => {
+                          const total = calculateTotalCompleted(habitLogs, habit.recurrence, habit.weekly_target);
+                          const rewardList = (rewardsMap[habit.id] || []).map((r) => ({
+                            ...r,
+                            timesAchieved: Math.floor(total / r.streak_target),
+                            daysToNext: r.streak_target - (total % r.streak_target),
+                          }));
+                          const achieved = rewardList.filter((r) => r.timesAchieved > 0);
+                          const next = rewardList.find((r) => r.timesAchieved === 0) ?? null;
+                          return (
+                            <div className="mt-4">
+                              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Recompensas</p>
+                              <div className="flex flex-wrap gap-2">
+                                {achieved.map((r, i) => (
+                                  <span key={i} className="inline-flex items-center gap-1 bg-green-50 text-green-700 text-xs font-medium px-2.5 py-1 rounded-full border border-green-200">
+                                    🏆 {r.description} · ×{r.timesAchieved} conseguida{r.timesAchieved !== 1 ? 's' : ''}
+                                  </span>
+                                ))}
+                                {next && (
+                                  <span className="inline-flex items-center gap-1 bg-gray-50 text-gray-500 text-xs font-medium px-2.5 py-1 rounded-full border border-gray-200">
+                                    🎯 A {next.daysToNext} días de: {next.description}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </div>
                     );
                   })}

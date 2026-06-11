@@ -61,6 +61,8 @@ function HabitForm({ title, setTitle, description, setDescription, recurrence, s
   weeklyTarget, setWeeklyTarget, dueTime, setDueTime, expiresDate, setExpiresDate,
   expiresTime, setExpiresTime, categoryId, setCategoryId, photoRequired, setPhotoRequired,
   assignedIds, toggleAssigned, validatorIds, toggleValidator, members, categories,
+  rewards, newRewardDays, setNewRewardDays, newRewardDesc, setNewRewardDesc,
+  showAddRewardForm, setShowAddRewardForm, addReward, removeReward,
   onSubmit, onCancel, saving, modalError, submitLabel }) {
   return (
     <form onSubmit={onSubmit} className="px-6 py-4 space-y-4 max-h-[75vh] overflow-y-auto">
@@ -232,6 +234,60 @@ function HabitForm({ title, setTitle, description, setDescription, recurrence, s
         </div>
       ) : null}
 
+      {/* Recompensas */}
+      <div>
+        <label className="block text-sm font-medium text-black mb-2">Recompensas</label>
+        {rewards.length > 0 && (
+          <div className="space-y-1 mb-2">
+            {rewards.map((r, i) => (
+              <div key={i} className="flex items-center justify-between border border-gray-100 px-3 py-1.5 bg-gray-50">
+                <span className="text-sm text-gray-700">🎯 {r.streak_target} días → {r.description}</span>
+                <button
+                  type="button"
+                  onClick={() => removeReward(i)}
+                  className="text-gray-400 hover:text-red-500 transition-colors text-lg leading-none ml-2"
+                >×</button>
+              </div>
+            ))}
+          </div>
+        )}
+        {showAddRewardForm ? (
+          <div className="flex gap-2 items-center mt-1">
+            <input
+              type="number"
+              min="1"
+              value={newRewardDays}
+              onChange={(e) => setNewRewardDays(e.target.value)}
+              placeholder="Días"
+              className="w-20 border border-gray-200 px-2 py-1.5 text-sm focus:outline-none focus:border-black transition-colors"
+            />
+            <input
+              type="text"
+              value={newRewardDesc}
+              onChange={(e) => setNewRewardDesc(e.target.value)}
+              placeholder="Ej: Cena en familia"
+              className="flex-1 border border-gray-200 px-3 py-1.5 text-sm focus:outline-none focus:border-black transition-colors"
+            />
+            <button
+              type="button"
+              onClick={addReward}
+              className="px-3 py-1.5 bg-[#0A66C2] text-white text-sm font-medium hover:bg-blue-700 transition-colors"
+            >Añadir</button>
+            <button
+              type="button"
+              onClick={() => { setShowAddRewardForm(false); setNewRewardDays(''); setNewRewardDesc(''); }}
+              className="text-gray-400 hover:text-black text-xl leading-none"
+            >×</button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setShowAddRewardForm(true)}
+            className="text-sm text-[#0A66C2] hover:underline"
+          >+ Añadir recompensa</button>
+        )}
+      </div>
+
       {modalError ? <p className="text-sm text-red-600">{modalError}</p> : null}
 
       <div className="flex gap-3 pt-2 pb-2">
@@ -325,6 +381,23 @@ export default function Habits({ companyId, adminId }) {
   const [expiresTime, setExpiresTime] = useState('');
   const [assignedIds, setAssignedIds] = useState([]);
   const [validatorIds, setValidatorIds] = useState([]);
+  const [rewards, setRewards] = useState([]);
+  const [newRewardDays, setNewRewardDays] = useState('');
+  const [newRewardDesc, setNewRewardDesc] = useState('');
+  const [showAddRewardForm, setShowAddRewardForm] = useState(false);
+
+  const addReward = () => {
+    const days = parseInt(newRewardDays, 10);
+    if (!days || days < 1 || !newRewardDesc.trim()) return;
+    setRewards((prev) => [...prev, { streak_target: days, description: newRewardDesc.trim() }]);
+    setNewRewardDays('');
+    setNewRewardDesc('');
+    setShowAddRewardForm(false);
+  };
+
+  const removeReward = (idx) => {
+    setRewards((prev) => prev.filter((_, i) => i !== idx));
+  };
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -415,6 +488,7 @@ export default function Habits({ companyId, adminId }) {
     setCategoryId(''); setPhotoRequired(true); setDueTime('');
     setExpiresDate(''); setExpiresTime('');
     setAssignedIds([]); setValidatorIds([]);
+    setRewards([]); setNewRewardDays(''); setNewRewardDesc(''); setShowAddRewardForm(false);
     setModalError('');
     setModalOpen(true);
   };
@@ -465,6 +539,9 @@ export default function Habits({ companyId, adminId }) {
       if (validatorIds.length > 0) {
         ops.push(supabase.from('habit_validators').insert(validatorIds.map((user_id) => ({ habit_id: habitId, user_id }))));
       }
+      if (rewards.length > 0) {
+        ops.push(supabase.from('habit_rewards').insert(rewards.map((r) => ({ habit_id: habitId, streak_target: r.streak_target, description: r.description }))));
+      }
       const results = await Promise.all(ops);
       for (const { error } of results) { if (error) throw error; }
       setModalOpen(false);
@@ -501,15 +578,18 @@ export default function Habits({ companyId, adminId }) {
     setEditLoadingAssignments(true);
     setEditingHabit(habit);
 
+    setRewards([]); setNewRewardDays(''); setNewRewardDesc(''); setShowAddRewardForm(false);
     try {
-      const [{ data: aData }, { data: vData }] = await Promise.all([
+      const [{ data: aData }, { data: vData }, { data: rData }] = await Promise.all([
         supabase.from('habit_assignments').select('user_id').eq('habit_id', habit.id),
         supabase.from('habit_validators').select('user_id').eq('habit_id', habit.id),
+        supabase.from('habit_rewards').select('streak_target, description').eq('habit_id', habit.id).order('streak_target'),
       ]);
       setAssignedIds((aData || []).map((r) => r.user_id));
       setValidatorIds((vData || []).map((r) => r.user_id));
+      setRewards(rData || []);
     } catch {
-      // Non-critical: checkboxes start unchecked if fetch fails
+      // Non-critical: checkboxes/rewards start empty if fetch fails
     } finally {
       setEditLoadingAssignments(false);
     }
@@ -526,7 +606,7 @@ export default function Habits({ companyId, adminId }) {
         expiresAt = new Date(`${expiresDate}T${expiresTime || '23:59'}`).toISOString();
       }
 
-      const [updateResult, delAssign, delValidators] = await Promise.all([
+      const [updateResult, delAssign, delValidators, delRewards] = await Promise.all([
         supabase.from('habits').update({
           title: title.trim(),
           description: description.trim() || null,
@@ -539,10 +619,12 @@ export default function Habits({ companyId, adminId }) {
         }).eq('id', editingHabit.id),
         supabase.from('habit_assignments').delete().eq('habit_id', editingHabit.id),
         supabase.from('habit_validators').delete().eq('habit_id', editingHabit.id),
+        supabase.from('habit_rewards').delete().eq('habit_id', editingHabit.id),
       ]);
       if (updateResult.error) throw updateResult.error;
       if (delAssign.error) throw delAssign.error;
       if (delValidators.error) throw delValidators.error;
+      if (delRewards.error) throw delRewards.error;
 
       const insertOps = [];
       if (assignedIds.length > 0) {
@@ -550,6 +632,9 @@ export default function Habits({ companyId, adminId }) {
       }
       if (validatorIds.length > 0) {
         insertOps.push(supabase.from('habit_validators').insert(validatorIds.map((user_id) => ({ habit_id: editingHabit.id, user_id }))));
+      }
+      if (rewards.length > 0) {
+        insertOps.push(supabase.from('habit_rewards').insert(rewards.map((r) => ({ habit_id: editingHabit.id, streak_target: r.streak_target, description: r.description }))));
       }
       const results = await Promise.all(insertOps);
       for (const { error } of results) { if (error) throw error; }
@@ -689,6 +774,10 @@ export default function Habits({ companyId, adminId }) {
               assignedIds={assignedIds} toggleAssigned={toggleAssigned}
               validatorIds={validatorIds} toggleValidator={toggleValidator}
               members={members} categories={categories}
+              rewards={rewards} newRewardDays={newRewardDays} setNewRewardDays={setNewRewardDays}
+              newRewardDesc={newRewardDesc} setNewRewardDesc={setNewRewardDesc}
+              showAddRewardForm={showAddRewardForm} setShowAddRewardForm={setShowAddRewardForm}
+              addReward={addReward} removeReward={removeReward}
               onSubmit={handleCreateHabit} onCancel={() => setModalOpen(false)}
               saving={saving} modalError={modalError} submitLabel="Crear hábito"
             />
@@ -720,6 +809,10 @@ export default function Habits({ companyId, adminId }) {
                 assignedIds={assignedIds} toggleAssigned={toggleEditAssigned}
                 validatorIds={validatorIds} toggleValidator={toggleEditValidator}
                 members={members} categories={categories}
+                rewards={rewards} newRewardDays={newRewardDays} setNewRewardDays={setNewRewardDays}
+                newRewardDesc={newRewardDesc} setNewRewardDesc={setNewRewardDesc}
+                showAddRewardForm={showAddRewardForm} setShowAddRewardForm={setShowAddRewardForm}
+                addReward={addReward} removeReward={removeReward}
                 onSubmit={handleEditHabit} onCancel={() => setEditingHabit(null)}
                 saving={editSaving} modalError={editError} submitLabel="Guardar cambios"
               />
