@@ -509,6 +509,14 @@ export default function Habits({ companyId, adminId }) {
     if (assignedIds.length === 0) { setModalError('Asigna el hábito al menos a un miembro'); return; }
     setSaving(true); setModalError('');
     try {
+      const { data: limitOk, error: limitErr } = await supabase.rpc('check_habit_limit', { p_company_id: companyId });
+      if (limitErr) throw limitErr;
+      if (limitOk === false) {
+        setModalError('Has alcanzado el límite de hábitos activos de tu plan actual');
+        setSaving(false);
+        return;
+      }
+
       let expiresAt = null;
       if (recurrence === 'once' && expiresDate) {
         expiresAt = new Date(`${expiresDate}T${expiresTime || '23:59'}`).toISOString();

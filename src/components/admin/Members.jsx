@@ -65,6 +65,14 @@ export default function Members({ companyId, adminId }) {
     setSaving(true);
     setModalError('');
     try {
+      const { data: limitOk, error: limitErr } = await supabase.rpc('check_member_limit', { p_company_id: companyId });
+      if (limitErr) throw limitErr;
+      if (limitOk === false) {
+        setModalError('Has alcanzado el límite de miembros de tu plan actual');
+        setSaving(false);
+        return;
+      }
+
       const code = generateCode();
       const { error: insertError } = await supabase.from('activation_codes').insert({
         code,
