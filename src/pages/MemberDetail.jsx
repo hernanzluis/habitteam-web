@@ -200,6 +200,7 @@ export default function MemberDetail() {
   const [validatedLogIds, setValidatedLogIds] = useState(new Set());
   const [rewardsMap, setRewardsMap] = useState({});
   const [lightboxUrl, setLightboxUrl] = useState(null);
+  const [adminCompanyId, setAdminCompanyId] = useState(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -211,6 +212,7 @@ export default function MemberDetail() {
         .eq('id', authUser.id)
         .single();
       if (!prof || prof.role !== 'admin') { navigate('/acceder'); return; }
+      setAdminCompanyId(prof.company_id);
       setChecking(false);
     };
     checkAuth();
@@ -224,11 +226,16 @@ export default function MemberDetail() {
         { data: profileData, error: pErr },
         { data: assignmentsData, error: aErr },
       ] = await Promise.all([
-        supabase.from('profiles').select('id, full_name, email, avatar_url, created_at').eq('id', userId).single(),
+        supabase.from('profiles').select('id, full_name, email, avatar_url, created_at, company_id').eq('id', userId).single(),
         supabase.from('habit_assignments').select('habit_id').eq('user_id', userId),
       ]);
       if (pErr) throw pErr;
       if (aErr) throw aErr;
+
+      if (!profileData || profileData.company_id !== adminCompanyId) {
+        navigate('/admin');
+        return;
+      }
 
       const habitIds = (assignmentsData || []).map((a) => a.habit_id);
 
@@ -314,7 +321,7 @@ export default function MemberDetail() {
     } finally {
       setLoading(false);
     }
-  }, [userId]);
+  }, [userId, adminCompanyId, navigate]);
 
   useEffect(() => { if (!checking) loadData(); }, [checking, loadData]);
 
