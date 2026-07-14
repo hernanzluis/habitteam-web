@@ -23,7 +23,7 @@ export default function Acceder() {
 
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('role')
+        .select('role, company_id')
         .eq('id', data.user.id)
         .single();
 
@@ -34,6 +34,17 @@ export default function Acceder() {
 
       if (profile.role !== 'admin') {
         setError('Solo los administradores pueden acceder desde la web');
+        return;
+      }
+
+      const { data: company, error: companyError } = await supabase
+        .from('companies')
+        .select('plan')
+        .eq('id', profile.company_id)
+        .single();
+
+      if (companyError || !company || company.plan !== 'empresa') {
+        setError('El panel web solo está disponible para el plan Empresa');
         return;
       }
 

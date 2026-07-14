@@ -28,9 +28,11 @@ export default function Admin() {
 
       const { data: company } = await supabase
         .from('companies')
-        .select('name')
+        .select('name, plan')
         .eq('id', prof.company_id)
         .single();
+
+      if (!company || company.plan !== 'empresa') { navigate('/acceder'); return; }
 
       setProfile(prof);
       setCompanyName(company?.name || '');
