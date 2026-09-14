@@ -212,6 +212,14 @@ export default function MemberDetail() {
         .eq('id', authUser.id)
         .single();
       if (!prof || prof.role !== 'admin') { navigate('/acceder'); return; }
+
+      const { data: company } = await supabase
+        .from('companies')
+        .select('plan')
+        .eq('id', prof.company_id)
+        .single();
+      if (!company || company.plan !== 'empresa') { navigate('/acceder'); return; }
+
       setAdminCompanyId(prof.company_id);
       setChecking(false);
     };
